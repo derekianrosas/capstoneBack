@@ -74,6 +74,24 @@ def get_all_vehicles():
     all_vehicles = db.session.query(VehicleRecord).all()
     return jsonify(multiple_record_schema.dump(all_vehicles))
 
+@app.route("/user/create", methods=["POST"])
+def create_user():
+    if request.content_type != "application/json":
+        return jsonify("Error: Data must be sent as JSON")
+    
+    post_data = request.get_json()
+    username = post_data.get("username")
+    password = post_data.get("password")
+
+    username_check = db.session.query(User.username).filter(User.username == username).first()
+    if username_check is not None:
+        return jsonify("Username Unavailable")
+    
+    record = User(username, password)
+    db.session.add(record)
+    db.session.commit()
+
+    return jsonify("User Created Successfully")
 
 
 
