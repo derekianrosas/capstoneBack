@@ -76,6 +76,14 @@ def get_all_vehicles():
     all_vehicles = db.session.query(VehicleRecord).all()
     return jsonify(multiple_record_schema.dump(all_vehicles))
 
+@app.route("/vehicle-record/delete", methods=["DELETE"])
+def delete_vehicle_by_id(id):
+    vehicle = db.session.query(VehicleRecord).filter(VehicleRecord.id == id).first()
+    db.session.delete(vehicle)
+    db.session.commit()
+    return jsonify("Vehicle Scrapped")
+
+
 @app.route("/user/create", methods=["POST"])
 def create_user():
     if request.content_type != "application/json":
