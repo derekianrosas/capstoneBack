@@ -93,6 +93,10 @@ def create_user():
 
     return jsonify("User Created Successfully")
 
+@app.route("/user/get", methods=["GET"])
+def get_all_users():
+    all_users = db.session.query(User).filter(User.id == id).first()
+    return jsonify(users_schema.dump(all_users))
 
 
 
