@@ -13,5 +13,8 @@ flask-cors = "*"
 flask-heroku = "*"
 flask-gunicorn = "*"
 psycopg2-binary = "*"
+bcrypt = "*"
+flask-bcrypt = "*"
+
 [requires]
 python_version = "3.8.3"

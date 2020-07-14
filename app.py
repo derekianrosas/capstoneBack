@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_cors import CORS
 from flask_heroku import Heroku
+from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgres://qdhxhgochdraxa:44fe4bee2c1ae599a683c3323e8353f97908904710c765007a1f50fbe0aa9363@ec2-35-172-85-250.compute-1.amazonaws.com:5432/d2da13lph59jgg"
@@ -12,6 +13,7 @@ ma = Marshmallow(app)
 
 heroku = Heroku(app)
 CORS(app)
+bcrypt = Bcrypt(app)
 
 class VehicleRecord(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -84,10 +86,13 @@ def create_user():
     password = post_data.get("password")
 
     username_check = db.session.query(User.username).filter(User.username == username).first()
+
     if username_check is not None:
         return jsonify("Username Unavailable")
+
+    hashed_password = bcrypt.generate_password_hash(password).decode("utf8")    
     
-    record = User(username, password)
+    record = User(username, hashed_password)
     db.session.add(record)
     db.session.commit()
 
@@ -115,6 +120,11 @@ def verify_user():
     stored_password = db.session.query(User.password).filter(User.username == username).first()
 
     if stored_password is None:
+        return jsonify("User NOT Verified")
+    
+    valid_password_check = bcrypt.check_password_hash(stored_password[0], password)
+
+    if valid_password_check == False:
         return jsonify("User NOT Verified")
 
     return jsonify("User Verified")
